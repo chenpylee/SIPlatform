@@ -127,7 +127,10 @@ class Model {
     public function flush() {
         // 缓存不存在则查询数据表信息
         $this->db->setModel($this->name);
+
         $fields =   $this->db->getFields($this->getTableName());
+        //print_r($fields);
+
         if(!$fields) { // 无法获取字段信息
             return false;
         }
@@ -238,6 +241,7 @@ class Model {
      */
      protected function _facade($data) {
 
+        //print_r($this->options);
         // 检查数据字段合法性
         if(!empty($this->fields)) {
             if(!empty($this->options['field'])) {
@@ -248,8 +252,10 @@ class Model {
                 }    
             }else{
                 $fields =   $this->fields;
-            }        
+            }
+
             foreach ($data as $key=>$val){
+                //echo $key.":".$val;
                 if(!in_array($key,$fields,true)){
                     if(APP_DEBUG){
                         E(L('_DATA_TYPE_INVALID_').':['.$key.'=>'.$val.']');
@@ -301,6 +307,7 @@ class Model {
         if(false === $this->_before_insert($data,$options)) {
             return false;
         }
+
         // 写入数据到数据库
         $result = $this->db->insert($data,$options,$replace);
         if(false !== $result ) {
@@ -1420,7 +1427,9 @@ class Model {
      * @return array
      */
     public function getDbFields(){
+        //print_r($this->options);
         if(isset($this->options['table'])) {// 动态指定表名
+            //echo 'a';
             $array      =   explode(' ',$this->options['table']);
             $fields     =   $this->db->getFields($array[0]);
             return  $fields?array_keys($fields):false;

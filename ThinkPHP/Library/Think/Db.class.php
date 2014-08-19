@@ -703,6 +703,8 @@ class Db {
         $sql   =  ($replace?'REPLACE':'INSERT').' INTO '.$this->parseTable($options['table']).' ('.implode(',', $fields).') VALUES ('.implode(',', $values).')';
         $sql   .= $this->parseLock(isset($options['lock'])?$options['lock']:false);
         $sql   .= $this->parseComment(!empty($options['comment'])?$options['comment']:'');
+        //$sql="INSERT INTO platform_users (username,password,createtime,status) VALUES ('ninikin1','ninikinpwd',TO_DATE(1980-01-01,YYYY-MM-DD),1)";
+        echo $sql;
         return $this->execute($sql,$this->parseBind(!empty($options['bind'])?$options['bind']:array()));
     }
 

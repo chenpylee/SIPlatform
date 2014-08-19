@@ -20,6 +20,15 @@ class Oracle extends Db{
     private     $table        = '';
     protected   $selectSql    = 'SELECT * FROM (SELECT thinkphp.*, rownum AS numrow FROM (SELECT  %DISTINCT% %FIELD% FROM %TABLE%%JOIN%%WHERE%%GROUP%%HAVING%%ORDER%) thinkphp ) %LIMIT%%COMMENT%';
 
+    //$result=$Model->field("to_char(CREATETIME,'YYYY-MM-DD HH24:mi:ss') timeinfo")->select();
+
+
+    public static function getCurrentDate()
+    {
+        return "TO_DATE('".date('Y-m-d H:i:s')."','yyyy-mm-dd hh24:mi:ss')";
+    }
+
+
     /**
      * 架构函数 读取数据库配置信息
      * @access public
@@ -100,6 +109,7 @@ class Oracle extends Db{
      * @return mixed
      */
     public function query($str) {
+        //echo $str."<br/>";
         $this->initConnect(false);
         if ( !$this->_linkID ) return false;
         $this->queryStr = $str;
@@ -127,6 +137,24 @@ class Oracle extends Db{
      * @return integer
      */
      public function execute($str) {
+        //$str="INSERT INTO platform_users (username,password,createtime,status) VALUES ('ninikin','TO_DATE(''1980-01-01'',''YYYY-MM-DD'')','TO_DATE(''1982-03-02'',''YYYY-MM-DD'')',1)";
+         /** 在插入或升级新值时 Oracle to_date()函数处理 **/
+         if(preg_match_all("/'TO_DATE\([^\(\)]+\)'/i",$str,$match2,PREG_SET_ORDER))
+         {
+             //echo count($match2);
+             foreach($match2 as $dateMatch)
+             {
+
+                 $dateStr=$dateMatch[0];
+                 $replace=str_ireplace("''","$",$dateStr);
+                 $replace=str_ireplace("'","",$replace);
+                 $replace=str_ireplace("$","'",$replace);
+                 $str=str_ireplace($dateStr,$replace,$str);
+             }
+         }
+
+
+
         $this->initConnect(true);
         if ( !$this->_linkID ) return false;
         $this->queryStr = $str;
@@ -134,9 +162,20 @@ class Oracle extends Db{
         $flag = false;
         if(preg_match("/^\s*(INSERT\s+INTO)\s+(\w+)\s+/i", $this->queryStr, $match)) {
             $this->table = C("DB_SEQUENCE_PREFIX") .str_ireplace(C("DB_PREFIX"), "", $match[2]);
+            /**
+             *
+             * 'DB_PREFIX'=>'tb_',//表名前缀
+             * 'DB_SEQUENCE_PREFIX' =>    'seq_',//序列名前缀
+             * 'DB_TRIGGER_PREFIX'    =>    'tig_',//触发器名前缀
+             */
             $flag = (boolean)$this->query("SELECT * FROM user_sequences WHERE sequence_name='" . strtoupper($this->table) . "'");
+
+
+
         }//modify by wyfeng at 2009.08.28
 
+        // echo '<br/>'.$str.'<br/>';
+        // exit;
         //更改事务模式
         $this->mode = OCI_COMMIT_ON_SUCCESS;
         //释放前次的查询结果
@@ -234,9 +273,14 @@ class Oracle extends Db{
                   ."from user_tab_columns a,(select column_name from user_constraints c,user_cons_columns col "
           ."where c.constraint_name=col.constraint_name and c.constraint_type='P'and c.table_name='".strtoupper($tableName)
           ."') b where table_name='".strtoupper($tableName)."' and a.column_name=b.column_name(+)");
+        //echo $tableName;
         $info   =   array();
         if($result) {
             foreach ($result as $key => $val) {
+
+                //echo strtolower($val['column_name']);
+                $val=array_change_key_case($val,CASE_LOWER);
+
                 $info[strtolower($val['column_name'])] = array(
                     'name'    => strtolower($val['column_name']),
                     'type'    => strtolower($val['data_type']),
@@ -247,6 +291,7 @@ class Oracle extends Db{
                 );
             }
         }
+        //print_r($info);
         return $info;
     }
 

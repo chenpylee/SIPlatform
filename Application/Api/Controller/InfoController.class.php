@@ -15,12 +15,10 @@ class InfoController extends RestController{
     protected $allowType = array('html','xml','json'); // REST允许请求的资源类型列表
     Public function rest(){
         $id=I('get.id');
-        print_r($_GET);
         $data=new TestData();
         $data->name="1";
         $data->id=$id;
         $this->response($data,'json',403);
-
     }
 
 } 

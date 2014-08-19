@@ -1,0 +1,47 @@
+<layout name="layout"/>
+<script type="text/javascript">
+    var url_auditor_search="{:U('Admin/Ajax/auditor_search_handler')}";
+</script>
+<div class="row">
+    <div class="col-xs-2 col-md-2">
+        <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">稽核人员列表</a></li>
+            <li><a href="#">添加稽核人员</a></li>
+        </ul>
+    </div>
+    <div class="col-xs-2 col-md-10">
+        <h3><span class="label label-success">稽核人员列表</span></h3>
+        <div class="input-group custom-search-form">
+            <input type="text" id="auditor-search-key" class="search-input form-control" placeholder="请输入要添加的稽核人员身份证号码或姓名">
+                                <span class="input-group-btn">
+                                <button id="auditor-search" class="btn btn-default" type="button">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+        </div>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading" id="search-title"></div>
+
+            <!-- Table -->
+            <table class="table" id="search-results">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>姓名</th>
+                    <th>性别</th>
+                    <th>身份证号</th>
+                    <th>个人编号</th>
+                    <th>单位名称</th>
+                    <th>联系电话</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+
+                <tbody id="datas">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
